@@ -19,7 +19,7 @@ def save_to_excel(new_data_dict):
     new_df = pd.DataFrame([new_data_dict])
     if os.path.exists(DB_FILE):
         existing_df = pd.read_excel(DB_FILE)
-        updated_df = pd.concat([existing_df, new_df], ignore_index=True)[cite: 1]
+        updated_df = pd.concat([existing_df, new_df], ignore_index=True)
         updated_df.to_excel(DB_FILE, index=False)
     else:
         new_df.to_excel(DB_FILE, index=False)
@@ -114,7 +114,7 @@ if page == "Faculty Submission":
                 "Labs": ", ".join(labs), "Paper_Title": p_title, "Publisher": pub_name,
                 "Photo_Path": photo_path, "Paper_Path": pdf_path, "Total_Score": score
             }
-            save_to_excel(record)[cite: 1]
+            save_to_excel(record)
             st.success("Data submitted successfully! Admin will review your record.")
         else:
             st.error("Please enter Name and Faculty ID.")
