@@ -73,7 +73,7 @@ page = st.sidebar.radio("Go to", ["Faculty Submission", "Admin Dashboard"])
 
 # --- 4. Page: Faculty Submission ---
 if page == "Faculty Submission":
-    st.title("🎓 Faculty Entry Portal")
+    st.title("🎓 Faculty API SYSTEM")
     
     with st.form("faculty_form", clear_on_submit=True):
         col1, col2 = st.columns(2)
