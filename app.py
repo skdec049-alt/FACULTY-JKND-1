@@ -47,16 +47,16 @@ def upload_to_drive(uploaded_file, folder_id):
         # 1. Setup Metadata
         file_metadata = {
             'name': uploaded_file.name,
-            'parents': [folder_id] 
+            'parents': [folder_id] # Forces file into your shared folder
         }
         
         # 2. Prepare the file stream
-        uploaded_file.seek(0) # <--- This must line up with 'file_metadata'
+        uploaded_file.seek(0)
         file_content = uploaded_file.read()
         media = MediaIoBaseUpload(
             io.BytesIO(file_content), 
             mimetype=uploaded_file.type, 
-            resumable=False 
+            resumable=False # Keep this False to avoid some quota checks
         )
 
         # 3. Execute
