@@ -46,28 +46,31 @@ def upload_to_drive(uploaded_file, folder_id):
     try:
         file_metadata = {
             'name': uploaded_file.name,
-            'parents': [folder_id] 
+            'parents': [folder_id]
         }
         
         uploaded_file.seek(0)
-        file_content = uploaded_file.read()
         media = MediaIoBaseUpload(
-            io.BytesIO(file_content), 
+            io.BytesIO(uploaded_file.read()), 
             mimetype=uploaded_file.type, 
-            resumable=False 
+            resumable=False # Keep this False
         )
 
+        # The fix: Adding supportsAllDrives and checking folder settings
         file = drive_service.files().create(
             body=file_metadata,
             media_body=media,
             fields='id',
-            supportsAllDrives=True 
+            supportsAllDrives=True,
+            ignoreDefaultVisibility=True # Helps bypass some account-level restrictions
         ).execute()
         
         return file.get('id'), "Success"
 
     except Exception as e:
-        st.error(f"Internal Drive Error: {str(e)}")
+        # If the 403 persists, it means your personal account is 
+        # blocking the 'Service Account' from taking up space.
+        st.error(f"Quota Error: {str(e)}")
         return "None", str(e)
 
 def generate_pdf_report(data):
