@@ -44,34 +44,34 @@ def append_to_gsheet(record):
 
 def upload_to_drive(uploaded_file, folder_id):
     try:
-      file_metadata = {
-    'name': uploaded_file.name,
-    'parents': [folder_id]  # This is the "Link" to your quota
-}   
-        uploaded_file.seek(0)
+        # 1. Setup Metadata
+        file_metadata = {
+            'name': uploaded_file.name,
+            'parents': [folder_id] 
+        }
+        
+        # 2. Prepare the file stream
+        uploaded_file.seek(0) # <--- This must line up with 'file_metadata'
+        file_content = uploaded_file.read()
         media = MediaIoBaseUpload(
-            io.BytesIO(uploaded_file.read()), 
+            io.BytesIO(file_content), 
             mimetype=uploaded_file.type, 
-            resumable=False # Keep this False
+            resumable=False 
         )
 
-        # The fix: Adding supportsAllDrives and checking folder settings
+        # 3. Execute
         file = drive_service.files().create(
             body=file_metadata,
             media_body=media,
             fields='id',
-            supportsAllDrives=True,
-            ignoreDefaultVisibility=True # Helps bypass some account-level restrictions
+            supportsAllDrives=True 
         ).execute()
         
         return file.get('id'), "Success"
 
     except Exception as e:
-        # If the 403 persists, it means your personal account is 
-        # blocking the 'Service Account' from taking up space.
-        st.error(f"Quota Error: {str(e)}")
+        st.error(f"Internal Drive Error: {str(e)}")
         return "None", str(e)
-
 def generate_pdf_report(data):
     """Generates a professional PDF report."""
     pdf = FPDF()
