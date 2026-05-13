@@ -25,32 +25,36 @@ drive_service = build('drive', 'v3', credentials=creds)
 # --- 2. CORE CLOUD FUNCTIONS ---
 
 def upload_to_drive(uploaded_file, folder_id):
-    file_metadata = {
-        'name': uploaded_file.name,
-        'parents': [folder_id]  # This forces the file to use the folder owner's quota
-    }
-    
-    # Reset file pointer to the beginning
-    uploaded_file.seek(0)
-    
-    media = MediaIoBaseUpload(
-        io.BytesIO(uploaded_file.read()), 
-        mimetype=uploaded_file.type,
-        resumable=True
-    )
-
     try:
+        # 1. Setup Metadata
+        file_metadata = {
+            'name': uploaded_file.name,
+            'parents': [folder_id] # Forces file into your shared folder
+        }
+        
+        # 2. Prepare the file stream
+        uploaded_file.seek(0)
+        file_content = uploaded_file.read()
+        media = MediaIoBaseUpload(
+            io.BytesIO(file_content), 
+            mimetype=uploaded_file.type, 
+            resumable=False  # Switch to False for smaller files to avoid some quota checks
+        )
+
+        # 3. Execute with 'supportsAllDrives'
         file = drive_service.files().create(
             body=file_metadata,
             media_body=media,
             fields='id',
-            # Add this if you are using a workspace/school shared drive
-            supportsAllDrives=True 
+            supportsAllDrives=True # Required if the folder is in a Shared Drive
         ).execute()
-        return file.get('id')
+        
+        return file.get('id'), "Success"
+
     except Exception as e:
-        st.error(f"Upload failed: {e}")
-        return None
+        # This will print the specific error in your Streamlit UI for debugging
+        st.error(f"Internal Drive Error: {str(e)}")
+        return "None", str(e)
 
 def generate_pdf_report(data):
     """Generates a professional PDF report."""
