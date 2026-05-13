@@ -47,8 +47,7 @@ def upload_to_drive(uploaded_file, folder_id):
       file_metadata = {
     'name': uploaded_file.name,
     'parents': [folder_id]  # This is the "Link" to your quota
-}
-        
+}   
         uploaded_file.seek(0)
         media = MediaIoBaseUpload(
             io.BytesIO(uploaded_file.read()), 
