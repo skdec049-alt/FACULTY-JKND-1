@@ -10,7 +10,7 @@ from fpdf import FPDF
 
 # --- 1. CLOUD CONFIGURATION ---
 # Replace this with your actual Folder ID from the Google Drive URL
-DRIVE_FOLDER_ID = "YOUR_FOLDER_ID_HERE" 
+DRIVE_FOLDER_ID = "https://drive.google.com/drive/u/2/folders/1tKtZVRzlVYIeyvIke8oRRwJ3s3jJPkFy" 
 SHEET_NAME = "Faculty_DB" 
 ADMIN_PASSWORD = "admin123"
 
