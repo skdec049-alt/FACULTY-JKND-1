@@ -1,8 +1,5 @@
 streamlit
 pandas
-gspread
-google-oauth2
-google-api-python-client
 fpdf
-Pillow
-requests
+st-gsheets-connection
+google-auth
