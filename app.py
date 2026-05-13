@@ -44,10 +44,10 @@ def append_to_gsheet(record):
 
 def upload_to_drive(uploaded_file, folder_id):
     try:
-        file_metadata = {
-            'name': uploaded_file.name,
-            'parents': [folder_id]
-        }
+      file_metadata = {
+    'name': uploaded_file.name,
+    'parents': [folder_id]  # This is the "Link" to your quota
+}
         
         uploaded_file.seek(0)
         media = MediaIoBaseUpload(
