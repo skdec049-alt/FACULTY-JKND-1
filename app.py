@@ -24,18 +24,33 @@ drive_service = build('drive', 'v3', credentials=creds)
 
 # --- 2. CORE CLOUD FUNCTIONS ---
 
-def upload_to_drive(file_obj, folder_id):
-    """Uploads files to Google Drive and returns a permanent link."""
-    file_metadata = {'name': file_obj.name, 'parents': [folder_id]}
-    media = MediaIoBaseUpload(io.BytesIO(file_obj.getvalue()), mimetype=file_obj.type)
-    file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    # Returns a link that allows the PDF generator to access the image
-    return f"https://drive.google.com/uc?id={file.get('id')}", file.get('id')
+def upload_to_drive(uploaded_file, folder_id):
+    file_metadata = {
+        'name': uploaded_file.name,
+        'parents': [folder_id]  # This forces the file to use the folder owner's quota
+    }
+    
+    # Reset file pointer to the beginning
+    uploaded_file.seek(0)
+    
+    media = MediaIoBaseUpload(
+        io.BytesIO(uploaded_file.read()), 
+        mimetype=uploaded_file.type,
+        resumable=True
+    )
 
-def append_to_gsheet(row_data):
-    """Permanently appends a row to Google Sheets."""
-    sheet = client.open(SHEET_NAME).sheet1
-    sheet.append_row(row_data)
+    try:
+        file = drive_service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id',
+            # Add this if you are using a workspace/school shared drive
+            supportsAllDrives=True 
+        ).execute()
+        return file.get('id')
+    except Exception as e:
+        st.error(f"Upload failed: {e}")
+        return None
 
 def generate_pdf_report(data):
     """Generates a professional PDF report."""
